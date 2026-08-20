@@ -30,3 +30,13 @@ mongoose.connect(process.env.MONGO_URI)
     });
   })
   .catch((err) => console.log(err));
+
+  const corsOptions = {
+  origin: [
+    "http://localhost:5173",
+    "https://your-app-name.vercel.app" // we'll update this after frontend deploys
+  ],
+  credentials: true
+};
+
+app.use(cors(corsOptions));
