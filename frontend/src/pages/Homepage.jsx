@@ -1,9 +1,11 @@
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
 import { FiSearch, FiHome, FiTrendingUp, FiMessageSquare } from 'react-icons/fi';
 
 const HomePage = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const features = [
     { icon: <FiSearch size={28} />, title: 'Smart Search', desc: 'Filter by city, price, type, bedrooms and more' },
@@ -84,10 +86,10 @@ const HomePage = () => {
         <h2 className="text-3xl font-bold mb-4">Ready to Find Your Home?</h2>
         <p className="text-gray-400 mb-8">Join thousands of happy homeowners who found their dream property</p>
         <button
-          onClick={() => navigate('/register')}
+          onClick={() => user ? navigate('/properties') : navigate('/register')}
           className="bg-primary text-white px-8 py-3 rounded-xl font-semibold hover:bg-secondary transition"
         >
-          Get Started Free
+          {user ? 'Browse Properties' : 'Get Started Free'}
         </button>
       </section>
     </div>

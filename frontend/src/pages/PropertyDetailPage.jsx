@@ -7,6 +7,8 @@ import { MdLocalParking, MdOutlineChair } from 'react-icons/md';
 import AIChat from '../components/AIChat';
 import Loader from '../components/Loader';
 import toast from 'react-hot-toast';
+import { createEnquiry } from '../api';
+import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 
 const PropertyDetailPage = () => {
   const { id } = useParams();
@@ -14,6 +16,12 @@ const PropertyDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
   const [summaryLoading, setSummaryLoading] = useState(false);
+
+  const [showEnquiry, setShowEnquiry] = useState(false);
+  const [enquiryForm, setEnquiryForm] = useState({
+    buyerName: '', buyerEmail: '', buyerPhone: '', message: ''
+  });
+  const [enquiryLoading, setEnquiryLoading] = useState(false);
 
   useEffect(() => {
     const fetchProperty = async () => {
@@ -39,6 +47,24 @@ const PropertyDetailPage = () => {
       toast.error('Could not generate summary');
     } finally {
       setSummaryLoading(false);
+    }
+  };
+
+  const handleEnquiry = async () => {
+    if (!enquiryForm.buyerName || !enquiryForm.buyerEmail || !enquiryForm.message) {
+      toast.error('Please fill all required fields');
+      return;
+    }
+    setEnquiryLoading(true);
+    try {
+      await createEnquiry({ ...enquiryForm, propertyId: id });
+      toast.success('Enquiry sent! Agent will contact you within 24 hours.');
+      setShowEnquiry(false);
+      setEnquiryForm({ buyerName: '', buyerEmail: '', buyerPhone: '', message: '' });
+    } catch (error) {
+      toast.error('Failed to send enquiry');
+    } finally {
+      setEnquiryLoading(false);
     }
   };
 
@@ -119,6 +145,25 @@ const PropertyDetailPage = () => {
               </div>
             </div>
           )}
+      
+          {/* Google Map */}
+          <div className="mt-6">
+            <h2 className="text-lg font-semibold text-gray-800 mb-3">📍 Location</h2>
+            <div className="rounded-xl overflow-hidden h-64">
+              <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_KEY}>
+                <GoogleMap
+                  mapContainerStyle={{ width: '100%', height: '100%' }}
+                  center={{ lat: 15.2993, lng: 74.1240 }} // Default to Goa — update with actual coords
+                  zoom={13}
+                >
+                  <Marker position={{ lat: 15.2993, lng: 74.1240 }} />
+                </GoogleMap>
+              </LoadScript>
+            </div>
+            <p className="text-gray-500 text-sm mt-2">
+              📍 {property.location?.address}, {property.location?.city}, {property.location?.state}
+            </p>
+          </div>
 
           {/* AI Summary */}
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-5 border border-blue-100">
@@ -163,9 +208,52 @@ const PropertyDetailPage = () => {
               )}
             </div>
 
-            <button className="w-full bg-primary text-white py-3 rounded-xl hover:bg-secondary transition font-medium">
-              Contact Agent
+            {/* Contact Button */}
+            <button
+              onClick={() => setShowEnquiry(!showEnquiry)}
+              className="w-full bg-primary text-white py-3 rounded-xl hover:bg-secondary transition font-medium"
+            >
+              {showEnquiry ? 'Cancel' : 'Contact Agent'}
             </button>
+
+            {/* Enquiry Form */}
+            {showEnquiry && (
+              <div className="mt-4 space-y-3">
+                <input
+                  placeholder="Your Name *"
+                  value={enquiryForm.buyerName}
+                  onChange={(e) => setEnquiryForm({...enquiryForm, buyerName: e.target.value})}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+                <input
+                  placeholder="Your Email *"
+                  type="email"
+                  value={enquiryForm.buyerEmail}
+                  onChange={(e) => setEnquiryForm({...enquiryForm, buyerEmail: e.target.value})}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+                <input
+                  placeholder="Your Phone"
+                  value={enquiryForm.buyerPhone}
+                  onChange={(e) => setEnquiryForm({...enquiryForm, buyerPhone: e.target.value})}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+                <textarea
+                  placeholder="Your Message *"
+                  rows={3}
+                  value={enquiryForm.message}
+                  onChange={(e) => setEnquiryForm({...enquiryForm, message: e.target.value})}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+                <button
+                  onClick={handleEnquiry}
+                  disabled={enquiryLoading}
+                  className="w-full bg-green-500 text-white py-2 rounded-xl hover:bg-green-600 transition font-medium disabled:opacity-50"
+                >
+                  {enquiryLoading ? 'Sending...' : 'Send Enquiry'}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

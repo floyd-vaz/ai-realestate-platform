@@ -31,3 +31,10 @@ export const toggleSaveProperty = (id) => API.put(`/api/properties/${id}/save`);
 export const chatWithAI = (data) => API.post('/api/ai/chat', data);
 export const predictPrice = (data) => API.post('/api/ai/predict-price', data);
 export const generateSummary = (id) => API.get(`/api/ai/summary/${id}`);
+
+// ENQUIRIES
+export const createEnquiry = (data) => API.post('/api/enquiries', data);
+export const getEnquiries = () => API.get('/api/enquiries');
+export const getEnquiryStats = () => API.get('/api/enquiries/stats');
+export const updateEnquiry = (id, data) => API.put(`/api/enquiries/${id}`, data);
+export const deleteEnquiry = (id) => API.delete(`/api/enquiries/${id}`);
