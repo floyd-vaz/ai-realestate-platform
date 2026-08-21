@@ -12,7 +12,7 @@ const app = express();
 const corsOptions = {
   origin: [
     "http://localhost:5173",
-    "https://your-app-name.vercel.app"
+    "https://ai-realestate-platform.vercel.app"
   ],
   credentials: true
 };
