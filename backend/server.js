@@ -6,7 +6,7 @@ require('dotenv').config();
 const authRoutes = require('./routes/authRoutes');
 const propertyRoutes = require('./routes/propertyRoutes');
 const aiRoutes = require('./routes/aiRoutes');
-
+const enquiryRoutes = require('./routes/enquiryRoutes');
 const app = express();
 
 const corsOptions = {
@@ -24,6 +24,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/auth', authRoutes);
 app.use('/api/properties', propertyRoutes);
 app.use('/api/ai', aiRoutes);
+
+app.use('/api/enquiries', enquiryRoutes);
 
 app.get('/', (req, res) => {
   res.send('AI Real Estate API is running!');
